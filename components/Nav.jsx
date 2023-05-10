@@ -2,23 +2,20 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 
 const Nav = () => {
-  const { data: session } = useSession;
+  const { data: session } = useSession();
 
   const [providers, setProviders] = useState(null);
   const [toggleDropdown, setToggleDropdown] = useState(false);
 
   useEffect(() => {
-    const setUpProviders = async () => {
-      const response = await getProviders();
-
-      setProviders(response);
-    };
-
-    setUpProviders();
+    (async () => {
+      const res = await getProviders();
+      setProviders(res);
+    })();
   }, []);
 
   return (
@@ -26,7 +23,7 @@ const Nav = () => {
       <Link href="/" className="flex gap-2 flex-center">
         <Image
           src="/assets/images/logo.svg"
-          alt="Promptopia Logo"
+          alt="logo"
           width={30}
           height={30}
           className="object-contain"
@@ -34,7 +31,7 @@ const Nav = () => {
         <p className="logo_text">Promptopia</p>
       </Link>
 
-      {/* Desktop navigation*/}
+      {/* Desktop Navigation */}
       <div className="sm:flex hidden">
         {session?.user ? (
           <div className="flex gap-3 md:gap-5">
@@ -48,7 +45,7 @@ const Nav = () => {
 
             <Link href="/profile">
               <Image
-                src="/assets/images/logo.svg"
+                src={session?.user.image}
                 width={37}
                 height={37}
                 className="rounded-full"
@@ -63,10 +60,12 @@ const Nav = () => {
                 <button
                   type="button"
                   key={provider.name}
-                  onClick={() => signIn(provider.id)}
-                  className="blac_btn"
+                  onClick={() => {
+                    signIn(provider.id);
+                  }}
+                  className="black_btn"
                 >
-                  Sign In
+                  Sign in
                 </button>
               ))}
           </>
@@ -74,18 +73,18 @@ const Nav = () => {
       </div>
 
       {/* Mobile Navigation */}
-
       <div className="sm:hidden flex relative">
         {session?.user ? (
           <div className="flex">
             <Image
-              src="/assets/images/logo.svg"
+              src={session?.user.image}
               width={37}
               height={37}
               className="rounded-full"
               alt="profile"
-              onClick={() => setToggleDropdown((prev) => !prev)}
+              onClick={() => setToggleDropdown(!toggleDropdown)}
             />
+
             {toggleDropdown && (
               <div className="dropdown">
                 <Link
@@ -122,10 +121,12 @@ const Nav = () => {
                 <button
                   type="button"
                   key={provider.name}
-                  onClick={() => signIn(provider.id)}
+                  onClick={() => {
+                    signIn(provider.id);
+                  }}
                   className="black_btn"
                 >
-                  Sign In
+                  Sign in
                 </button>
               ))}
           </>
